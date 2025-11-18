@@ -214,9 +214,10 @@ async def process_video_task(video_id: int, video_path: str):
         db.update_video_status(video_id, "analyzing")
 
         # Create fresh analyzer for this video to track costs
-        analyzer = VideoAnalyzer()
+        # Use smaller batch size to reduce rate limit issues
+        analyzer = VideoAnalyzer(max_batch_size=20)
         analysis_results = analyzer.analyze_frames(
-            frame_paths[:100]  # Analyze first 100 frames to manage costs
+            frame_paths[:50]  # Analyze first 50 frames to manage costs and rate limits
         )
 
         # Get usage stats and calculate cost
