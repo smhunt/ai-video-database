@@ -589,32 +589,76 @@ async def handle_timestamp_query(
             timestamp=timestamp,
         )
 
-    # Analyze specific frame if no description
-    if not frame["description"]:
-        result = video_analyzer.analyze_single_frame(frame["frame_path"], query)
-        answer = result["answer"]
-    else:
-        # Use Claude to answer based on existing description
-        client = anthropic.Anthropic()
-        response = client.messages.create(
-            model="claude-3-haiku-20240307",
-            max_tokens=512,
-            messages=[
-                {
-                    "role": "user",
-                    "content": f"Based on this frame description: '{frame['description']}'\n\nAnswer this question: {query}",
-                }
-            ],
-        )
-        answer = response.content[0].text
+    # Get surrounding frames for context (±10 seconds)
+    all_frames = db.get_frames_for_video(video_id)
+    context_frames = [
+        f for f in all_frames
+        if abs(f["timestamp_seconds"] - timestamp) <= 10
+    ]
+    context_frames.sort(key=lambda x: x["timestamp_seconds"])
 
+    # Get transcript at this timestamp
+    transcript_segment = db.get_transcript_at_timestamp(video_id, timestamp)
+    transcript_text = transcript_segment["text"] if transcript_segment else None
+
+    # Build rich context
+    context_parts = []
+
+    # Add main frame description
+    if frame["description"]:
+        context_parts.append(f"At {timestamp:.1f}s: {frame['description']}")
+
+    # Add excitement level if available
+    if frame.get("excitement_score"):
+        context_parts.append(f"Excitement level: {frame['excitement_score']}/10")
+
+    # Add transcript if available
+    if transcript_text:
+        context_parts.append(f"Audio: \"{transcript_text}\"")
+
+    # Add surrounding context
+    if len(context_frames) > 1:
+        context_parts.append("\nSurrounding moments:")
+        for cf in context_frames[:5]:  # Max 5 context frames
+            if cf["id"] != frame["id"] and cf["description"]:
+                context_parts.append(
+                    f"- {cf['timestamp_seconds']:.1f}s: {cf['description'][:100]}"
+                )
+
+    # If we have good context, provide direct answer
+    if frame["description"] or transcript_text:
+        answer_parts = []
+
+        # Start with the timestamp
+        answer_parts.append(f"At {timestamp:.1f} seconds:")
+
+        # Add visual description
+        if frame["description"]:
+            answer_parts.append(f"\n👁️ Visual: {frame['description']}")
+
+        # Add audio/transcript
+        if transcript_text:
+            answer_parts.append(f'\n🎤 Audio: "{transcript_text}"')
+
+        # Add excitement context
+        if frame.get("excitement_score") and frame["excitement_score"] >= 7:
+            answer_parts.append(f"\n⚡ This is an exciting moment (score: {frame['excitement_score']}/10)!")
+
+        answer = "".join(answer_parts)
+    else:
+        # Fallback: analyze the frame with Claude
+        result = video_analyzer.analyze_single_frame(frame["frame_path"], query)
+        answer = f"At {timestamp:.1f} seconds:\n{result.get('answer', 'Frame analysis not available')}"
+
+    # Include the main frame and nearby frames
     relevant_frames = [
         {
-            "frame_id": frame["id"],
-            "timestamp": frame["timestamp_seconds"],
-            "description": frame["description"] or answer,
-            "image_url": f"/api/frames/{frame['id']}/image",
+            "frame_id": cf["id"],
+            "timestamp": cf["timestamp_seconds"],
+            "description": cf["description"] or "",
+            "image_url": f"/api/frames/{cf['id']}/image",
         }
+        for cf in context_frames[:3]
     ]
 
     return ChatResponse(

@@ -164,7 +164,7 @@ class VisualFeedbackTool(Tool):
         # Use sync client
         base_client = anthropic.Anthropic()
         self.anthropic_client = instructor.from_anthropic(base_client)
-        self.model = "claude-3-5-sonnet-latest"
+        self.model = "claude-3-haiku-20240307"  # Use Haiku since Sonnet isn't available
         self.client = client
 
     def forward(
