@@ -408,7 +408,14 @@ class VideoChat {
             timelineFrames.forEach(frame => {
                 const frameEl = document.createElement('div');
                 frameEl.className = 'timeline-frame';
-                frameEl.onclick = () => this.seekToTime(frame.timestamp_seconds);
+
+                // Ensure click handler is properly attached
+                frameEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(`Seeking to ${frame.timestamp_seconds}s`);
+                    this.seekToTime(frame.timestamp_seconds);
+                });
 
                 // Build tooltip content
                 const tooltipText = frame.description || 'No description available';
@@ -417,7 +424,7 @@ class VideoChat {
                     : '';
 
                 frameEl.innerHTML = `
-                    <img src="${frame.thumbnail_url}" alt="Frame at ${this.formatTime(frame.timestamp_seconds)}">
+                    <img src="${frame.thumbnail_url}" alt="Frame at ${this.formatTime(frame.timestamp_seconds)}" style="pointer-events: none;">
                     <div class="timestamp-label">${this.formatTime(frame.timestamp_seconds)}</div>
                     <div class="frame-tooltip">
                         <strong>${this.formatTime(frame.timestamp_seconds)}</strong>
@@ -464,10 +471,17 @@ class VideoChat {
             highlights.forEach(frame => {
                 const highlightEl = document.createElement('div');
                 highlightEl.className = 'highlight-item';
-                highlightEl.onclick = () => this.seekToTime(frame.timestamp_seconds);
+
+                // Proper click handler
+                highlightEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(`Jumping to highlight at ${frame.timestamp_seconds}s`);
+                    this.seekToTime(frame.timestamp_seconds);
+                });
 
                 highlightEl.innerHTML = `
-                    <img src="${frame.thumbnail_url}" alt="Highlight" class="highlight-thumbnail">
+                    <img src="${frame.thumbnail_url}" alt="Highlight" class="highlight-thumbnail" style="pointer-events: none;">
                     <div class="highlight-info">
                         <div class="highlight-time">
                             ${this.formatTime(frame.timestamp_seconds)}
@@ -495,10 +509,17 @@ class VideoChat {
             frames.forEach((frame, index) => {
                 const card = document.createElement('div');
                 card.className = 'keyframe-card';
-                card.onclick = () => this.seekToTime(frame.timestamp_seconds);
+
+                // Proper click handler
+                card.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log(`Jumping to keyframe at ${frame.timestamp_seconds}s`);
+                    this.seekToTime(frame.timestamp_seconds);
+                });
 
                 card.innerHTML = `
-                    <img src="${frame.thumbnail_url}" alt="Frame at ${this.formatTime(frame.timestamp_seconds)}">
+                    <img src="${frame.thumbnail_url}" alt="Frame at ${this.formatTime(frame.timestamp_seconds)}" style="pointer-events: none;">
                     <div class="keyframe-time">${this.formatTime(frame.timestamp_seconds)}</div>
                 `;
 
@@ -511,8 +532,21 @@ class VideoChat {
     }
 
     seekToTime(seconds) {
+        if (!this.videoPlayer || !this.videoPlayer.src) {
+            console.error('Video player not ready');
+            return;
+        }
+
+        console.log(`Seeking video to ${seconds} seconds`);
         this.videoPlayer.currentTime = seconds;
-        this.videoPlayer.play();
+
+        // Scroll video into view if needed
+        this.videoPlayer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+        // Play the video
+        this.videoPlayer.play().catch(err => {
+            console.warn('Autoplay prevented, video paused at timestamp');
+        });
     }
 
     async sendMessage() {
