@@ -169,6 +169,8 @@
             border-right: 1px solid #e0e0e0;
             overflow-y: auto;
             height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .chat-section {
@@ -287,8 +289,9 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
-            max-height: 300px;
+            max-height: 200px;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .video-item {
@@ -382,12 +385,16 @@
         }
 
         .timeline-container {
-            margin: 20px 0;
+            margin: 15px 0 0 0;
             display: none;
+            flex: 1;
+            overflow-y: auto;
+            min-height: 0;
         }
 
         .timeline-container.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
 
         .timeline-strip {
