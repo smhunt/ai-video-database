@@ -29,8 +29,8 @@ You now have a fully functional **local video chat system** that lets you upload
 4. **Semantic Search** (`src/services/video_embeddings.py`)
    - Qdrant vector database integration
    - MixedBread AI embeddings (1024-dim)
-   - "Find explosions" style queries
-   - Excitement threshold filtering
+   - Natural language queries like "Show me the first dance"
+   - Excitement threshold filtering for highlights
 
 5. **Database** (`src/models/database.py`)
    - SQLite with comprehensive schema
@@ -101,12 +101,12 @@ Status will update automatically:
 **Example Queries:**
 
 ```
-"Summarize this video"
+"Show me when we walked down the aisle"
 "What happens at 1:23?"
-"Find exciting moments"
-"Show me outdoor scenes"
-"When do people appear?"
-"Describe the scene at 45 seconds"
+"Find the first kiss"
+"When did the best man give his speech?"
+"Find all the dancing moments"
+"Show me when grandma arrived"
 ```
 
 The system automatically:
@@ -144,8 +144,9 @@ Responses include clickable frame thumbnails - click to seek the video player to
 Not just keyword matching - understands concepts:
 
 ```
-"Find explosions"  → Matches: "large fire", "impact", "debris flying"
-"Show outdoor scenes" → Matches: "forest", "sky", "landscape", "nature"
+"Show the ceremony"     → Matches: "vows", "rings", "altar", "officiant"
+"Find emotional moments" → Matches: "tears", "hugging", "smiling", "laughter"
+"Show outdoor scenes"    → Matches: "garden", "sky", "venue exterior"
 ```
 
 ---

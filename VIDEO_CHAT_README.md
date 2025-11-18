@@ -85,21 +85,28 @@ The server will start at: **http://localhost:8000**
 
 ### Chat Examples
 
+**Wedding Video Queries:**
+- "Show me when we walked down the aisle"
+- "Find the first kiss"
+- "When did the best man give his speech?"
+- "Show me all the dancing moments"
+- "Find the cake cutting scene"
+
 **Timestamp Queries:**
 - "What happens at 1:23?"
 - "Describe the scene at 45 seconds"
-- "What's going on at 2:15?"
+- "Who's talking at 2:15?"
 
 **Content Search:**
-- "Find explosions"
-- "Show me outdoor scenes"
-- "When do people appear?"
-- "Find exciting moments"
+- "Find outdoor scenes"
+- "Show me when everyone was laughing"
+- "When did grandma appear?"
+- "Find all the emotional moments"
 
 **General Questions:**
 - "Summarize this video"
-- "What are the main themes?"
-- "Describe the setting"
+- "What were the main events?"
+- "Describe the venue"
 
 ### Timeline Navigation
 
