@@ -903,7 +903,6 @@ class VideoChat {
         };
         return types[type] || type;
     }
-}
 
     // Status Panel Management
     initStatusPanel() {
