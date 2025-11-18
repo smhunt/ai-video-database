@@ -7,3 +7,20 @@ src/embeddings/vector_db/*
 **/*.log
 .DS_Store
 **/samples/*
+
+# Video data directories (large files)
+data/videos/*
+data/frames/*
+data/thumbnails/*
+data/*.db
+data/*.db-journal
+
+# Output videos
+output/*.mp4
+output/*.MOV
+output/*.avi
+
+# Virtual environment
+.venv/
+venv/
+*.pyc
