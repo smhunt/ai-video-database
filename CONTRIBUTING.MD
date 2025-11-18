@@ -1,4 +1,4 @@
-# Contributing to Video Composer Agent
+# Contributing to AI Video Database
 
 Thanks for your interest in contributing! Here's how to get started.
 
@@ -6,8 +6,8 @@ Thanks for your interest in contributing! Here's how to get started.
 
 1. Fork and clone the repo
 ```bash
-git clone https://github.com/YOUR_USERNAME/video-composer-agent.git
-cd video-composer-agent
+git clone https://github.com/YOUR_USERNAME/ai-video-database.git
+cd ai-video-database
 ```
 
 2. Install dependencies with uv

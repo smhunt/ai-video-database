@@ -53,7 +53,7 @@ result = video_tool.forward(
 
     // Credits (appears 10-15 seconds)
     const credits = new core.TextClip({
-        text: 'Created with AI Video Composer',
+        text: 'Created with AI Video Database',
         position: { x: 'center', y: '80%' },
         fontSize: 30,
         fillColor: '#CCCCCC'

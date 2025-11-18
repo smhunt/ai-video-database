@@ -364,7 +364,7 @@ Found a bug? Have ideas? PRs welcome!
 
 ## 📄 License
 
-Part of the AI Video Composer Agent project.
+Part of the AI Video Database project.
 
 ---
 

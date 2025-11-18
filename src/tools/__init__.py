@@ -1,4 +1,4 @@
-"""Video Composer Agent tools package."""
+"""AI Video Database tools package."""
 
 from .docs_search import DocsSearchTool
 from .video_editor import VideoEditorTool

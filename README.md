@@ -1,6 +1,6 @@
 <p align="center">
   <img src="./docs/assets/banner.png" alt="Library Banner" style="aspect-ratio: 1200/500;width: 100%;" />
-  <h1 align="center">Video Composer Agent</h1>
+  <h1 align="center">AI Video Database</h1>
 </p>
 
 <p align="center">
@@ -28,7 +28,7 @@ uv add -r requirements.txt
 
 ## Environment Variables
 
-You will need to use the environment variables defined in `.env.example` to run Video Composer Agent. It's recommended you use Vercel Environment Variables for this, but a `.env` file is all that is necessary.
+You will need to use the environment variables defined in `.env.example` to run AI Video Database. It's recommended you use Vercel Environment Variables for this, but a `.env` file is all that is necessary.
 
 **Note:** You should not commit your `.env` file or it will expose secrets that will allow others to control access to your various OpenAI and authentication provider accounts.
 

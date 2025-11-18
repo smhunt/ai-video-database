@@ -418,7 +418,7 @@ Found a bug? Have ideas for improvements?
 
 ## 📄 License
 
-Part of the AI Video Composer Agent project.
+Part of the AI Video Database project.
 
 ---
 
@@ -432,4 +432,4 @@ Built with:
 
 ---
 
-**Made with ❤️ for the AI Video Composer project**
+**Made with ❤️ for the AI Video Database project**

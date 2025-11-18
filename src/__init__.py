@@ -1,1 +1,1 @@
-"""Video Composer Agent package."""
+"""AI Video Database package."""
