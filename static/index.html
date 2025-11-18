@@ -78,10 +78,14 @@
 
         .tab-content.active {
             display: grid;
-            grid-template-columns: 1fr 400px;
+            grid-template-columns: 1fr 400px 250px;
             gap: 0;
             height: calc(100vh - 180px);
             max-height: calc(100vh - 180px);
+        }
+
+        .tab-content.active.status-collapsed {
+            grid-template-columns: 1fr 400px 40px;
         }
 
         .costs-tab-content {
@@ -767,6 +771,160 @@
             margin-right: 5px;
         }
 
+        /* Status Panel */
+        .status-panel {
+            background: #f8f9fa;
+            border-left: 1px solid #e0e0e0;
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .status-panel.collapsed {
+            width: 40px !important;
+        }
+
+        .status-toggle {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            z-index: 10;
+            transition: transform 0.3s;
+        }
+
+        .status-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        .status-content {
+            padding: 50px 15px 15px 15px;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .status-panel.collapsed .status-content {
+            display: none;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            position: absolute;
+            width: calc(100% - 30px);
+        }
+
+        .status-card.active {
+            opacity: 1;
+            transform: translateY(0);
+            position: relative;
+        }
+
+        .status-card-title {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-card-content {
+            font-size: 0.9em;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .status-large-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin: 10px 0;
+        }
+
+        .status-progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .status-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+        }
+
+        .status-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .status-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85em;
+        }
+
+        .status-list li:last-child {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .status-badge.ready { background: #4caf50; color: white; }
+        .status-badge.processing { background: #ffc107; color: #000; }
+        .status-badge.error { background: #f44336; color: white; }
+
+        .status-indicator {
+            display: flex;
+            gap: 4px;
+            margin-top: 10px;
+            justify-content: center;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #ddd;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-dot.active {
+            background: #667eea;
+            width: 20px;
+            border-radius: 3px;
+        }
+
         @media (max-width: 968px) {
             .main-content {
                 grid-template-columns: 1fr;
@@ -871,6 +1029,74 @@
                             disabled
                         >
                         <button id="send-btn" disabled>Send</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-panel" id="status-panel">
+                <button class="status-toggle" id="status-toggle" title="Toggle Status Panel">
+                    <span id="toggle-icon">📊</span>
+                </button>
+
+                <div class="status-content" id="status-content">
+                    <!-- Card 1: Processing Progress -->
+                    <div class="status-card active" data-card="0">
+                        <div class="status-card-title">
+                            <span>⚙️</span> Processing Status
+                        </div>
+                        <div class="status-card-content" id="processing-card">
+                            <div id="processing-status">No videos processing</div>
+                            <div class="status-progress-bar" id="processing-bar" style="display: none;">
+                                <div class="status-progress-fill" id="processing-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: Cost Tracker -->
+                    <div class="status-card" data-card="1">
+                        <div class="status-card-title">
+                            <span>💰</span> Today's Costs
+                        </div>
+                        <div class="status-card-content">
+                            <div class="status-large-number" id="cost-today">$0.00</div>
+                            <div style="font-size: 0.85em; color: #666;">
+                                Total: <span id="cost-total">$0.00</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: Video Library Stats -->
+                    <div class="status-card" data-card="2">
+                        <div class="status-card-title">
+                            <span>📚</span> Library
+                        </div>
+                        <div class="status-card-content">
+                            <ul class="status-list" id="library-stats">
+                                <li>0 videos ready</li>
+                                <li>0 processing</li>
+                                <li>0 total</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Recent Activity -->
+                    <div class="status-card" data-card="3">
+                        <div class="status-card-title">
+                            <span>🕒</span> Recent Activity
+                        </div>
+                        <div class="status-card-content">
+                            <ul class="status-list" id="recent-activity">
+                                <li style="color: #999;">No recent activity</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Rotation Indicators -->
+                    <div class="status-indicator">
+                        <div class="status-dot active" data-dot="0"></div>
+                        <div class="status-dot" data-dot="1"></div>
+                        <div class="status-dot" data-dot="2"></div>
+                        <div class="status-dot" data-dot="3"></div>
                     </div>
                 </div>
             </div>

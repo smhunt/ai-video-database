@@ -905,7 +905,155 @@ class VideoChat {
     }
 }
 
+    // Status Panel Management
+    initStatusPanel() {
+        this.statusPanel = document.getElementById('status-panel');
+        this.statusToggle = document.getElementById('status-toggle');
+        this.toggleIcon = document.getElementById('toggle-icon');
+        this.statusCards = document.querySelectorAll('.status-card');
+        this.statusDots = document.querySelectorAll('.status-dot');
+        this.currentCard = 0;
+        this.rotationInterval = null;
+        this.rotationPaused = false;
+
+        // Toggle collapse/expand
+        this.statusToggle.addEventListener('click', () => {
+            this.statusPanel.classList.toggle('collapsed');
+            document.getElementById('main-tab').classList.toggle('status-collapsed');
+            this.toggleIcon.textContent = this.statusPanel.classList.contains('collapsed') ? '📊' : '✖';
+        });
+
+        // Manual card selection
+        this.statusDots.forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                this.showCard(index);
+                this.pauseRotation();
+            });
+        });
+
+        // Pause rotation on hover
+        this.statusPanel.addEventListener('mouseenter', () => {
+            this.pauseRotation();
+        });
+
+        this.statusPanel.addEventListener('mouseleave', () => {
+            this.resumeRotation();
+        });
+
+        // Start rotation
+        this.startRotation();
+
+        // Update status every 3 seconds
+        setInterval(() => this.updateStatusPanel(), 3000);
+        this.updateStatusPanel();
+    }
+
+    showCard(index) {
+        this.currentCard = index;
+        this.statusCards.forEach((card, i) => {
+            card.classList.toggle('active', i === index);
+        });
+        this.statusDots.forEach((dot, i) => {
+            dot.classList.toggle('active', i === index);
+        });
+    }
+
+    startRotation() {
+        this.rotationInterval = setInterval(() => {
+            if (!this.rotationPaused) {
+                this.currentCard = (this.currentCard + 1) % this.statusCards.length;
+                this.showCard(this.currentCard);
+            }
+        }, 5000); // Rotate every 5 seconds
+    }
+
+    pauseRotation() {
+        this.rotationPaused = true;
+    }
+
+    resumeRotation() {
+        this.rotationPaused = false;
+    }
+
+    async updateStatusPanel() {
+        try {
+            // Update processing status
+            const videos = await (await fetch('/api/videos')).json();
+            const processingVideos = videos.filter(v =>
+                ['processing', 'analyzing', 'indexing', 'transcribing'].includes(v.status)
+            );
+
+            const processingStatus = document.getElementById('processing-status');
+            const processingBar = document.getElementById('processing-bar');
+            const processingFill = document.getElementById('processing-fill');
+
+            if (processingVideos.length > 0) {
+                const video = processingVideos[0];
+                processingStatus.textContent = `${video.filename} - ${video.status}`;
+                processingBar.style.display = 'block';
+
+                // Estimate progress based on status
+                const progress = {
+                    'processing': 25,
+                    'transcribing': 40,
+                    'analyzing': 60,
+                    'indexing': 85
+                }[video.status] || 10;
+
+                processingFill.style.width = `${progress}%`;
+            } else {
+                processingStatus.textContent = 'No videos processing';
+                processingBar.style.display = 'none';
+            }
+
+            // Update costs
+            const costs = await (await fetch('/api/costs')).json();
+            document.getElementById('cost-today').textContent = `$${costs.summary.last_24h_usd.toFixed(4)}`;
+            document.getElementById('cost-total').textContent = `$${costs.summary.total_cost_usd.toFixed(4)}`;
+
+            // Update library stats
+            const ready = videos.filter(v => v.status === 'ready').length;
+            const processing = processingVideos.length;
+            const total = videos.length;
+
+            document.getElementById('library-stats').innerHTML = `
+                <li><span class="status-badge ready">${ready}</span> ready</li>
+                <li><span class="status-badge processing">${processing}</span> processing</li>
+                <li>${total} total</li>
+            `;
+
+            // Update recent activity
+            const recentOps = costs.recent_operations || [];
+            const activityList = document.getElementById('recent-activity');
+
+            if (recentOps.length > 0) {
+                activityList.innerHTML = recentOps.slice(0, 3).map(op => {
+                    const time = new Date(op.timestamp);
+                    const ago = this.timeAgo(time);
+                    return `<li>${this.formatOperationType(op.operation_type)} - ${ago}</li>`;
+                }).join('');
+            } else {
+                activityList.innerHTML = '<li style="color: #999;">No recent activity</li>';
+            }
+
+        } catch (error) {
+            console.error('Error updating status panel:', error);
+        }
+    }
+
+    timeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        if (seconds < 60) return `${seconds}s ago`;
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes}m ago`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours}h ago`;
+        return `${Math.floor(hours / 24)}d ago`;
+    }
+}
+
 // Initialize app when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.videoChat = new VideoChat();
+    window.videoChat.initStatusPanel();
 });
